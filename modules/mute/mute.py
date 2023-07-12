@@ -9,8 +9,8 @@ from web3.middleware import construct_sign_and_send_raw_middleware
 
 from . import constants as cst
 from .abis.router import ROUTER_ABI
-from modules.helper import SimpleW3, retry
-from modules.global_constants import TOP_UP_WAIT
+from helper import SimpleW3, retry
+from global_constants import TOP_UP_WAIT
 
 
 class MuteIO(SimpleW3):

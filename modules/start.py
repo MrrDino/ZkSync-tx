@@ -4,7 +4,7 @@ import random
 import global_constants as gc
 
 from mute.mute import MuteIO
-from spacefi.sapcefi import SpaceFi
+from spacefi.spacefi import SpaceFi
 from syncswap.syncswap import SyncSwap
 from helper import get_txt_info, check_gas
 

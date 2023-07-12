@@ -12,8 +12,8 @@ from . import constants as cst
 from .abis.pair import PAIR_ABI
 from.abis.router import ROUTER_ABI
 from .abis.factory import FACTORY_ABI
-from modules.helper import SimpleW3, retry
-from modules.global_constants import TOP_UP_WAIT
+from helper import SimpleW3, retry
+from global_constants import TOP_UP_WAIT
 
 
 class SpaceFi(SimpleW3):

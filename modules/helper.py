@@ -6,14 +6,14 @@ import json
 import random
 import functools
 
+import global_constants as cst
+
 from web3 import Web3
 from loguru import logger
 from hexbytes.main import HexBytes
 from web3.types import ChecksumAddress
 from general_abis.erc20 import ERC20_ABI
 from eth_account.signers.local import LocalAccount
-
-import modules.global_constants as cst
 
 
 try:
