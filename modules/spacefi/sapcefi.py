@@ -18,6 +18,7 @@ from modules.global_constants import TOP_UP_WAIT
 
 class SpaceFi(SimpleW3):
 
+    @retry
     def start_swap(self, key: str, token0: str, token1: str, amount: float = None) -> int or None:
         """Функция запуска tokens swap для SpaceFi"""
 
@@ -42,7 +43,6 @@ class SpaceFi(SimpleW3):
         else:
             self.make_swap(w3=w3, amount=amount, account=account, token0=token0, token1=token1)
 
-    @retry
     def make_swap(
             self,
             w3: Web3,
