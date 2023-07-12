@@ -18,7 +18,7 @@ from eth_account.signers.local import LocalAccount
 
 try:
     logger.remove(0)
-    logger.add(sys.stdout, format="{time:D MMMM HH:mm:ss} | {level} | {message}")
+    logger.add(sys.stdout, format="{time:D MMMM HH:mm:ss} | {message}")
 except Exception:
     pass
 
@@ -147,6 +147,7 @@ class SimpleW3:
             })
 
             approve_tx = signer.sign_transaction(transaction)
+            logger.info('Approve transaction signed. Wait 30 sec.')
             time.sleep(30)
 
             tx = w3.eth.send_raw_transaction(approve_tx.rawTransaction)

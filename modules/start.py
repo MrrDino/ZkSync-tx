@@ -3,6 +3,8 @@ import random
 
 import global_constants as gc
 
+from loguru import logger
+
 from mute.mute import MuteIO
 from spacefi.spacefi import SpaceFi
 from syncswap.syncswap import SyncSwap
@@ -20,6 +22,7 @@ def start():
             gas = check_gas()
 
             if not gas:
+                logger.info(f'High gas. Wait {gc.TIMEOUT} sec.')
                 time.sleep(gc.TIMEOUT)
 
         exchange = gc.EXCHANGES[random.randint(0, 2)]
@@ -31,14 +34,16 @@ def start():
         else:
             swapper = MuteIO()
 
-        amount = swapper.start_swap(key=key, token0=gc.FROM, token1=gc.TO)
+        amount = swapper.start_swap(key=key, token0=gc.FROM, token1=gc.TO, pub_key=True)
 
         if gc.SWAP_BACK:
+            logger.info(f"Swap back. Wait {gc.DELAY1}")
             time.sleep(gc.DELAY1)
 
             amount = amount / 10 ** 18
             swapper.start_swap(key=key, token0=gc.TO, token1=gc.FROM, amount=amount)
 
+        logger.info(f"Change wallet. Wait {gc.DELAY2}")
         time.sleep(gc.DELAY2)
 
 

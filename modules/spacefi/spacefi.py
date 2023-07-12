@@ -19,12 +19,22 @@ from global_constants import TOP_UP_WAIT
 class SpaceFi(SimpleW3):
 
     @retry
-    def start_swap(self, key: str, token0: str, token1: str, amount: float = None) -> int or None:
+    def start_swap(
+            self,
+            key: str,
+            token0: str,
+            token1: str,
+            amount: float = None,
+            pub_key: bool = False
+    ) -> int or None:
         """Функция запуска tokens swap для SpaceFi"""
 
         w3 = self.connect()
         account = self.get_account(w3=w3, key=key)
         w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
+
+        if pub_key:
+            logger.info(f"Work with {account.address}")
 
         if not amount:
             need_msg = True
@@ -60,6 +70,7 @@ class SpaceFi(SimpleW3):
             account=account
         )
         token_in = cst.TOKENS[token0.lower()]  # если ETH -> поведение меняется
+        token_out = 'USDC' if token_in == 'ETH' else 'ETH'
 
         #  Если повторный свап -> переводим сумму из ETH в USDC
         if isinstance(amount, float):
@@ -91,11 +102,12 @@ class SpaceFi(SimpleW3):
                 )
 
                 if approved_tx:
-                    tx_rec = w3.eth.wait_for_transaction_receipt(approved_tx)
-                    logger.info(f'Approve tx: {approved_tx.hex()}. Status: {tx_rec["status"]}')
+                    gas = round(w3.eth.gas_price / 10 ** 9, 2)
+                    logger.info(f'|APPROVE| https://explorer.zksync.io/tx/{approved_tx.hex()}. Gas: {gas} Gwei')
+                    logger.info('Wait 50 sec.')
                     time.sleep(50)
                 else:
-                    # Doesn't need approve
+                    logger.info("Doesn't need approve. Wait 20 sec.")
                     time.sleep(20)
             except Exception as err:
                 logger.error(err)
@@ -115,23 +127,27 @@ class SpaceFi(SimpleW3):
                 'nonce': w3.eth.get_transaction_count(signer),
             })
 
+        gas_price = w3.eth.gas_price
         swap_tx.update(
             {
                 'gas': w3.eth.estimate_gas(swap_tx),
-                'maxFeePerGas': w3.eth.gas_price,
-                'maxPriorityFeePerGas': w3.eth.gas_price
+                'maxFeePerGas': gas_price,
+                'maxPriorityFeePerGas': gas_price
             }
         )
 
         signed_tx = account.sign_transaction(transaction_dict=swap_tx)
+        logger.info("Swap transaction signed. Wait 30 sec.")
         time.sleep(30)
         status = 0
 
         try:
             swap_tx = w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
             tx_rec = w3.eth.wait_for_transaction_receipt(swap_tx)
-            status = tx_rec['status']  # будет использоваться для переотправки
-            logger.info(f'Tx: {swap_tx.hex()}. Status: {status}')
+            gas = round(gas_price / 10 ** 9, 2)
+            status = tx_rec['status']
+
+            logger.info(f'|SWAP to {token_out}| https://explorer.zksync.io/tx/{swap_tx.hex()}. Gas: {gas} Gwei')
         except Exception as err:
             logger.error(err)
 
