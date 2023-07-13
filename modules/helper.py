@@ -26,7 +26,7 @@ except Exception:
 def get_gas() -> float:
     """Функция получения газа в сети ETH"""
 
-    w3 = Web3(Web3.HTTPProvider(cst.ETH_NODE))
+    w3 = Web3(Web3.HTTPProvider(cst.NODE))
     gas_price = w3.eth.gas_price / 10 ** 9
 
     return round(gas_price, 2)
@@ -80,7 +80,7 @@ def check_connection(w3: Web3) -> bool:
 class SimpleW3:
 
     def __init__(self):
-        self.node_url = 'https://rpc.ankr.com/zksync_era'
+        self.node_url = cst.NODE
 
     def connect(self) -> Web3:
         """Функция подключения к ноде"""

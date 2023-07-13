@@ -1,4 +1,4 @@
-ETH_NODE = 'https://rpc.ankr.com/eth'
+NODE = 'https://rpc.ankr.com/zksync_era'
 
 MAX_GAS = 20
 
