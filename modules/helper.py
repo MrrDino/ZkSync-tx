@@ -26,7 +26,7 @@ except Exception:
 def get_gas() -> float:
     """Функция получения газа в сети ETH"""
 
-    w3 = Web3(Web3.HTTPProvider(cst.NODE))
+    w3 = Web3(Web3.HTTPProvider(cst.ETH_NODE))
     gas_price = w3.eth.gas_price / 10 ** 9
 
     return round(gas_price, 2)
