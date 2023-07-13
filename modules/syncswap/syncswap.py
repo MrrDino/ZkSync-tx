@@ -26,6 +26,7 @@ class SyncSwap(SimpleW3):
             token0: str,
             token1: str,
             amount: float = None,
+            exchange: str = None,
             pub_key: bool = False
     ) -> int or None:
         """Функция запуска tokens swap для SyncSwap"""
@@ -35,7 +36,7 @@ class SyncSwap(SimpleW3):
         w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
 
         if pub_key:
-            logger.info(f"Work with {account.address}")
+            logger.info(f"Work with {account.address}. Exchange: \33[{36}m{exchange}\033[0m")
 
         if not amount:
             need_msg = True
