@@ -23,11 +23,19 @@ except Exception:
     pass
 
 
-def check_gas() -> bool:
-    """Функция проверки газа в сети ETH"""
+def get_gas() -> float:
+    """Функция получения газа в сети ETH"""
 
     w3 = Web3(Web3.HTTPProvider(cst.ETH_NODE))
     gas_price = w3.eth.gas_price / 10 ** 9
+
+    return round(gas_price, 2)
+
+
+def check_gas() -> bool:
+    """Функция проверки газа в сети ETH"""
+
+    gas_price = get_gas()
 
     if gas_price > cst.MAX_GAS:
         return False
@@ -164,7 +172,7 @@ def retry(func):
             try:
                 return func(*args, **kwargs)
             except Exception as err:
-                logger.error(f"Retry: {err}")
+                logger.error(f"\33[{31}mRetry: {err}\033[0m")
 
                 time.sleep(45)
 

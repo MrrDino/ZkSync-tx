@@ -12,8 +12,8 @@ from . import constants as cst
 from .abis.pair import PAIR_ABI
 from.abis.router import ROUTER_ABI
 from .abis.factory import FACTORY_ABI
-from helper import SimpleW3, retry
 from global_constants import TOP_UP_WAIT
+from helper import SimpleW3, retry, get_gas
 
 
 class SpaceFi(SimpleW3):
@@ -102,15 +102,26 @@ class SpaceFi(SimpleW3):
                 )
 
                 if approved_tx:
-                    gas = round(w3.eth.gas_price / 10 ** 9, 2)
-                    logger.info(f'|APPROVE| https://explorer.zksync.io/tx/{approved_tx.hex()}. Gas: {gas} Gwei')
+                    gas = get_gas()
+                    gas_price = w3.eth.gas_price
+
+                    tx_rec = w3.eth.wait_for_transaction_receipt(approved_tx)
+
+                    fee = self.get_fee(gas_used=tx_rec['gasUsed'], gas_price=gas_price, w3=w3)
+                    tx_fee = f"tx fee ${fee}"
+
+                    logger.info(
+                        f'||APPROVE| https://www.okx.com/explorer/zksync/tx/{approved_tx.hex()}. '
+                        f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
+                    )
                     logger.info('Wait 50 sec.')
+
                     time.sleep(50)
                 else:
                     logger.info("Doesn't need approve. Wait 20 sec.")
                     time.sleep(20)
             except Exception as err:
-                logger.error(err)
+                logger.error(f"\33[{31}m{err}\033[0m")
 
             swap_tx = router.functions.swapExactTokensForETH(
                 amount,
@@ -144,12 +155,18 @@ class SpaceFi(SimpleW3):
         try:
             swap_tx = w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
             tx_rec = w3.eth.wait_for_transaction_receipt(swap_tx)
-            gas = round(gas_price / 10 ** 9, 2)
-            status = tx_rec['status']
 
-            logger.info(f'|SWAP to {token_out}| https://explorer.zksync.io/tx/{swap_tx.hex()}. Gas: {gas} Gwei')
+            gas = get_gas()
+            status = tx_rec['status']
+            fee = self.get_fee(gas_used=tx_rec['gasUsed'], gas_price=gas_price, w3=w3)
+            tx_fee = f"tx fee ${fee}"
+
+            logger.info(
+                f'||SWAP to {token_out}| https://www.okx.com/explorer/zksync/tx/{swap_tx.hex()}. '
+                f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
+            )
         except Exception as err:
-            logger.error(err)
+            logger.error(f"\33[{31}m{err}\033[0m")
 
         assert status == 1
 
@@ -194,3 +211,17 @@ class SpaceFi(SimpleW3):
 
         return [token0, token1, account.address, router]
 
+    def get_fee(
+            self,
+            w3: Web3,
+            gas_price: int,
+            gas_used: float,
+    ) -> float:
+        """Функция получения комиссии транзакции в долларах"""
+
+        amount = (gas_used * gas_price) / 10 ** 18
+        token0 = self.to_address('0x5aea5775959fbc2557cc8789bc1bf90a239d9a91')
+        token1 = self.to_address('0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4')
+        fee = self.get_usd_value(amount=amount, w3=w3, token0=token1, token1=token0)
+
+        return round((fee / 10 ** 6), 2)

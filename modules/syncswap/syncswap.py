@@ -13,8 +13,8 @@ from .abis.pool import POOL_ABI
 from . import constants as cst
 from .abis.router import ROUTER_ABI
 from .abis.factory import FACTORY_ABI
-from helper import SimpleW3, retry
 from global_constants import TOP_UP_WAIT
+from helper import SimpleW3, retry, get_gas
 
 
 class SyncSwap(SimpleW3):
@@ -76,8 +76,8 @@ class SyncSwap(SimpleW3):
         router = self.get_contract(w3=w3, address=cst.ROUTER, abi=ROUTER_ABI)
 
         #  Если повторный свап -> переводим сумму из ETH в USDC
+        rate = self.get_rate(w3=w3, pool=pool_address, token_ch=token0)
         if isinstance(amount, float):
-            rate = self.get_rate(w3=w3, pool=pool_address, token_ch=token0)
             amount = self.get_swap_amount(amount=amount, rate=rate)
 
         if token_in != 'ETH':
@@ -93,15 +93,26 @@ class SyncSwap(SimpleW3):
                 )
 
                 if approved_tx:
-                    gas = round(w3.eth.gas_price / 10 ** 9, 2)
-                    logger.info(f'|APPROVE| https://explorer.zksync.io/tx/{approved_tx.hex()}. Gas: {gas} Gwei')
+                    gas = get_gas()
+                    gas_price = w3.eth.gas_price
+
+                    tx_rec = w3.eth.wait_for_transaction_receipt(approved_tx)
+
+                    fee = self.get_fee(gas_used=tx_rec['gasUsed'], gas_price=gas_price, rate=rate)
+                    tx_fee = f"tx fee ${fee}"
+
+                    logger.info(
+                        f'||APPROVE| https://www.okx.com/explorer/zksync/tx/{approved_tx.hex()}. '
+                        f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
+                    )
                     logger.info('Wait 50 sec.')
+
                     time.sleep(50)
                 else:
                     logger.info("Doesn't need approve. Wait 20 sec.")
                     time.sleep(20)
             except Exception as err:
-                logger.error(err)
+                logger.error(f"\33[{31}m{err}\033[0m")
 
         steps = [
             {
@@ -149,12 +160,18 @@ class SyncSwap(SimpleW3):
         try:
             swap_tx = w3.eth.send_raw_transaction(transaction=signed_tx.rawTransaction)
             tx_rec = w3.eth.wait_for_transaction_receipt(swap_tx)
-            gas = round(gas_price / 10 ** 9, 2)
-            status = tx_rec['status']
 
-            logger.info(f'|SWAP to {token_out}| https://explorer.zksync.io/tx/{swap_tx.hex()}. Gas: {gas} Gwei')
+            gas = get_gas()
+            status = tx_rec['status']
+            fee = self.get_fee(gas_used=tx_rec['gasUsed'], gas_price=gas_price, rate=rate)
+            tx_fee = f"tx fee ${fee}"
+
+            logger.info(
+                f'||SWAP to {token_out}| https://www.okx.com/explorer/zksync/tx/{swap_tx.hex()}. '
+                f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
+            )
         except Exception as err:
-            logger.error(err)
+            logger.error(f"\33[{31}m{err}\033[0m")
 
         assert status == 1
 
@@ -219,6 +236,14 @@ class SyncSwap(SimpleW3):
 
     @staticmethod
     def get_swap_amount(amount: float, rate: float, dec: int = 6) -> int:
-        """Функция суммы для обмена USDT/USDC"""
+        """Функция суммы для обмена USDT"""
 
         return int(amount * rate * (10 ** dec))
+
+    def get_fee(self, gas_used: float, gas_price: int, rate: float) -> float:
+        """Функция получения комиссии транзакции в долларах"""
+
+        fee = (gas_used * gas_price) / 10 ** 18
+        amount = self.get_swap_amount(amount=fee, rate=rate)
+
+        return round((amount / 10 ** 6), 2)
