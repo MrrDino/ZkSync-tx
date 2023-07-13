@@ -37,14 +37,16 @@ def start():
         amount = swapper.start_swap(key=key, token0=gc.FROM, token1=gc.TO, pub_key=True)
 
         if gc.SWAP_BACK:
-            logger.info(f"Swap back. Wait {gc.DELAY1}")
-            time.sleep(gc.DELAY1)
+            delay = random.randint(gc.DELAY1[0], gc.DELAY1[1])
+            logger.info(f"Swap back. Wait {delay}")
+            time.sleep(delay)
 
             amount = amount / 10 ** 18
             swapper.start_swap(key=key, token0=gc.TO, token1=gc.FROM, amount=amount)
 
-        logger.info(f"Change wallet. Wait {gc.DELAY2}")
-        time.sleep(gc.DELAY2)
+        delay = random.randint(gc.DELAY2[0], gc.DELAY2[1])
+        logger.info(f"Change wallet. Wait {delay}")
+        time.sleep(delay)
 
 
 if __name__ == '__main__':
