@@ -76,7 +76,7 @@ class SyncSwap(SimpleW3):
         router = self.get_contract(w3=w3, address=cst.ROUTER, abi=ROUTER_ABI)
 
         #  Если повторный свап -> переводим сумму из ETH в USDC
-        rate = self.get_rate(w3=w3, pool=pool_address, token_ch=token0)
+        rate = self.get_rate(w3=w3, pool=pool_address)
         if isinstance(amount, float):
             amount = self.get_swap_amount(amount=amount, rate=rate)
 
@@ -193,7 +193,7 @@ class SyncSwap(SimpleW3):
 
         return [pool, token0, token1, pool_address, account.address]
 
-    def get_rate(self, w3: Web3, pool: ChecksumAddress, token_ch: ChecksumAddress) -> float:
+    def get_rate(self, w3: Web3, pool: ChecksumAddress) -> float:
         """Функция получения курса в пуле"""
 
         contract = self.get_contract(w3=w3, address=pool, abi=POOL_ABI)
@@ -205,7 +205,7 @@ class SyncSwap(SimpleW3):
         else:
             usd = int(reserves[0] / 10 ** 6) / int(reserves[1] / 10 ** 18)
 
-        usd -= usd * cst.MULTS[token_ch.lower()]
+        usd -= usd * .0034
 
         return usd
 

@@ -222,6 +222,6 @@ class SpaceFi(SimpleW3):
         amount = (gas_used * gas_price) / 10 ** 18
         token0 = self.to_address('0x5aea5775959fbc2557cc8789bc1bf90a239d9a91')
         token1 = self.to_address('0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4')
-        fee = self.get_usd_value(amount=amount, w3=w3, token0=token1, token1=token0)
+        fee = self.get_usd_value(amount=amount, w3=w3, token0=token0, token1=token1)
 
         return round((fee / 10 ** 6), 2)
