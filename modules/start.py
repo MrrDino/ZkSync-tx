@@ -47,7 +47,6 @@ def start():
         delay = random.randint(gc.DELAY2[0], gc.DELAY2[1])
         logger.info(f"Change wallet. Wait {delay}")
         time.sleep(delay)
-        break
 
 
 if __name__ == '__main__':
