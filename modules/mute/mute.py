@@ -32,7 +32,7 @@ class MuteIO(SimpleW3):
         w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
 
         if pub_key:
-            logger.info(f"Work with {account.address}. Exchange: \33[{36}m{exchange}\033[0m")
+            logger.info(f"Work with \33[{35}m{account.address}\033[0m. Exchange: \33[{36}m{exchange}\033[0m")
 
         if not amount:
             need_msg = True
