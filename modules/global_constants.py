@@ -1,7 +1,7 @@
 NODE = 'https://rpc.ankr.com/zksync_era'
 ETH_NODE = 'https://rpc.ankr.com/eth'
 
-MAX_GAS = 20
+MAX_GAS = 30
 
 FROM = '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91'  # ETH
 TO = '0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4'  # USDC
@@ -14,7 +14,7 @@ SWAP_BACK = True  # Нужно ли менять актив обратно
 
 EXCHANGES = {
     0: 'SyncSwap',
-    1: 'SpaceFi',
+    1: 'Velocore',
     2: 'Mute'
 }
 

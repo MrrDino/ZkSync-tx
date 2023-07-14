@@ -6,8 +6,8 @@ import global_constants as gc
 from loguru import logger
 
 from mute.mute import MuteIO
-from spacefi.spacefi import SpaceFi
 from syncswap.syncswap import SyncSwap
+from velocore.velocore import Velocore
 from helper import get_txt_info, check_gas
 
 
@@ -29,12 +29,12 @@ def start():
 
         if exchange == 'SyncSwap':
             swapper = SyncSwap()
-        elif exchange == 'SpaceFi':
-            swapper = SpaceFi()
+        elif exchange == 'Velocore':
+            swapper = Velocore()
         else:
             swapper = MuteIO()
 
-        amount = swapper.start_swap(key=key, token0=gc.FROM, token1=gc.TO, pub_key=True)
+        amount = swapper.start_swap(key=key, token0=gc.FROM, token1=gc.TO, pub_key=True, exchange=exchange)
 
         if gc.SWAP_BACK:
             delay = random.randint(gc.DELAY1[0], gc.DELAY1[1])
@@ -47,6 +47,7 @@ def start():
         delay = random.randint(gc.DELAY2[0], gc.DELAY2[1])
         logger.info(f"Change wallet. Wait {delay}")
         time.sleep(delay)
+        break
 
 
 if __name__ == '__main__':
