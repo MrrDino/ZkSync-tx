@@ -114,11 +114,10 @@ class MuteIO(SimpleW3):
                         f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
                     )
                     logger.info('Wait 50 sec.')
-
                     time.sleep(50)
                 else:
-                    logger.info("Doesn't need approve. Wait 20 sec.")
-                    time.sleep(20)
+                    logger.info("Doesn't need approve. Wait 2 sec.")
+                    time.sleep(2)
             except Exception as err:
                 logger.error(f"\33[{31}m{err}\033[0m")
 
