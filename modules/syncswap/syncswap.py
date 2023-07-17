@@ -46,7 +46,7 @@ class SyncSwap(SimpleW3):
 
                 if not amount:
                     if need_msg:
-                        logger.error(f"Insufficient balance! Address - {account.address}, key - {key}.")
+                        logger.error(f"Insufficient balance! Address - {account.address} key - {key}.")
                         need_msg = False
                     time.sleep(TOP_UP_WAIT)
 
