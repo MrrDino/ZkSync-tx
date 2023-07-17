@@ -32,7 +32,7 @@ class MuteIO(SimpleW3):
         w3.middleware_onion.add(construct_sign_and_send_raw_middleware(account))
 
         if pub_key:
-            logger.info(f"Work with \33[{35}m{account.address}\033[0m. Exchange: \33[{36}m{exchange}\033[0m")
+            logger.info(f"Work with \33[{35}m{account.address}\033[0m Exchange: \33[{36}m{exchange}\033[0m")
 
         if not amount:
             need_msg = True
@@ -42,7 +42,7 @@ class MuteIO(SimpleW3):
 
                 if not amount:
                     if need_msg:
-                        logger.error(f"Insufficient balance! Address - {account.address}, key - {key}.")
+                        logger.error(f"Insufficient balance! Address - {account.address} key - {key}.")
                         need_msg = False
                     time.sleep(TOP_UP_WAIT)
 
@@ -110,7 +110,7 @@ class MuteIO(SimpleW3):
                     tx_fee = f"tx fee ${fee}"
 
                     logger.info(
-                        f'||APPROVE| https://www.okx.com/explorer/zksync/tx/{approved_tx.hex()}. '
+                        f'||APPROVE| https://www.okx.com/explorer/zksync/tx/{approved_tx.hex()} '
                         f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
                     )
                     logger.info('Wait 50 sec.')
@@ -162,7 +162,7 @@ class MuteIO(SimpleW3):
             tx_fee = f"tx fee ${fee}"
 
             logger.info(
-                f'||SWAP to {token_out}| https://www.okx.com/explorer/zksync/tx/{swap_tx.hex()}. '
+                f'||SWAP to {token_out}| https://www.okx.com/explorer/zksync/tx/{swap_tx.hex()} '
                 f'Gas: {gas} gwei, \33[{36}m{tx_fee}\033[0m'
             )
         except Exception as err:
